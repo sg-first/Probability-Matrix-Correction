@@ -77,7 +77,7 @@ def getMaxExpAnswer(chooseTimes):
                 maxExpAnswer = answer
         else:
             maxChoose = getMaxNumChoose(probMat, choosedList)
-            nextChoosedList = choosedList
+            nextChoosedList = copy.copy(choosedList)
             nextChoosedList.append(maxChoose)
             for i in range(leftTimes + 1):
                 nextAnswer = copy.copy(answer)
