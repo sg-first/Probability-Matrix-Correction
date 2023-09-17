@@ -69,9 +69,10 @@ def addAnswerByChoose(answer:dict, choose:str, chooseTimes:int):
 def getMaxProbAnswer(chooseTimes):
     choosedList = []
     answer = {}
+    leftTimes = len(probMat) # 剩余多少个没选
     for _ in allChoose:
         maxChoose = getMaxNumChoose(probMat, choosedList)
         choosedList.append(maxChoose)
-        answer = addAnswerByChoose(answer, maxChoose, chooseTimes)
+        answer = addAnswerByChoose(answer, maxChoose, chooseTimes) #fix:
     return answer
     
