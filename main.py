@@ -54,18 +54,24 @@ def calcExp(answer):
     return exp
 
 # 按选项顺序选题
-choosedList = []
-answer = {}
-
-def addAnswerByChoose(answer, choose, priorMaxVal):
+def addAnswerByChoose(answer:dict, choose:str, chooseTimes:int):
     probMatSortByA = copy.copy(probMat)
     probMatSortByA.sort(key=lambda i: i[choose], reverse=True)
-    for i in range(priorMaxVal):
-        col = probMatSortByA[i]
-        answer[col['ID']] = {'choose': choose, 'prob': col[choose]} # fix:选过的题不能再选，所以ID要查重
+    # 在probMatSortByA中选择未回答的前chooseTimes个问题，选择choose选项
+    allAnsweredID = list(answer.keys())
+    i = 0 # 当前已选数量
+    for col in probMat:
+        if col['ID'] not in allAnsweredID and i < chooseTimes:
+            answer[col['ID']] = {'choose': choose, 'prob': col[choose]}
+            i += 1
     return answer
 
-for _ in allChoose:
-    maxChoose = getMaxNumChoose(probMat, choosedList)
-    choosedList.append(maxChoose)
-    answer = addAnswerByChoose(answer, maxChoose, prior[maxChoose])
+def getMaxProbAnswer(chooseTimes):
+    choosedList = []
+    answer = {}
+    for _ in allChoose:
+        maxChoose = getMaxNumChoose(probMat, choosedList)
+        choosedList.append(maxChoose)
+        answer = addAnswerByChoose(answer, maxChoose, chooseTimes)
+    return answer
+    
