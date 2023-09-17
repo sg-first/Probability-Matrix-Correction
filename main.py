@@ -33,9 +33,6 @@ def getMaxNumChoose(probMat:list, choosedList):
                 maxChoose = choose
     return maxChoose
 
-# 全选A=1
-
-# 选两个A
 def calcExp(answer):
     def calcExpForChoose(choose): # 计算选某个选项的题正确的期望
         answerA = []
@@ -59,20 +56,46 @@ def addAnswerByChoose(answer:dict, choose:str, chooseTimes:int):
     probMatSortByA.sort(key=lambda i: i[choose], reverse=True)
     # 在probMatSortByA中选择未回答的前chooseTimes个问题，选择choose选项
     allAnsweredID = list(answer.keys())
-    i = 0 # 当前已选数量
+    i = 0 # 当前已选该选项数量
     for col in probMat:
         if col['ID'] not in allAnsweredID and i < chooseTimes:
             answer[col['ID']] = {'choose': choose, 'prob': col[choose]}
             i += 1
     return answer
 
-def getMaxProbAnswer(chooseTimes):
+def getMaxExpAnswer(chooseTimes):
     choosedList = []
     answer = {}
-    leftTimes = len(probMat) # 剩余多少个没选
-    for _ in allChoose:
-        maxChoose = getMaxNumChoose(probMat, choosedList)
-        choosedList.append(maxChoose)
-        answer = addAnswerByChoose(answer, maxChoose, chooseTimes) #fix:
-    return answer
+
+    maxExp = None
+    maxExpAnswer = None
+    def recu(answer, chooseSub, leftTimes, choosedList):
+        if chooseSub == len(allChoose) or len(answer) == len(probMat):
+            exp = calcExp(answer)
+            if maxExp is None or exp > maxExp:
+                maxExp = exp
+                maxExpAnswer = answer
+        else:
+            maxChoose = getMaxNumChoose(probMat, choosedList)
+            nextChoosedList = choosedList
+            nextChoosedList.append(maxChoose)
+            for i in range(leftTimes + 1):
+                nextAnswer = copy.copy(answer)
+                nextAnswer = addAnswerByChoose(nextAnswer, nextChoosedList, i)
+                recu(nextAnswer, chooseSub + 1, len(probMat) - len(nextAnswer), nextChoosedList)
+
+    # 第一次特殊处理
+    maxChoose = getMaxNumChoose(probMat, choosedList)
+    choosedList.append(maxChoose)
+    answer = addAnswerByChoose(answer, maxChoose, chooseTimes)
+    recu(answer, 1, len(probMat) - len(answer), choosedList)
+
+    return maxExpAnswer, maxExp
     
+# 全选A r3=1
+r2 = getMaxExpAnswer(2) # 选两个A
+r1 = getMaxExpAnswer(1) # 选一个A
+r0 = getMaxExpAnswer(0) # 选0个A
+print(r2)
+print(r1)
+print(r0)
