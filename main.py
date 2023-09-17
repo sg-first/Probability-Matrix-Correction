@@ -48,8 +48,13 @@ def calcExp(answer):
         while i < prior[choose] and i < len(answerA):
             answerAExp += answerA[i]
             i += 1
-        return answerAExp
-    
+        # 根据先验确定期望最小值
+        expMin = len(answerA) - (len(probMat) - prior[choose])
+        if answerAExp < expMin:
+            return expMin
+        else:
+            return answerAExp
+
     exp = 0
     for choose in allChoose:
         exp += calcExpForChoose(choose)
